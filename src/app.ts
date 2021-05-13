@@ -6,7 +6,7 @@
 import {
     Actor,
     AnimationEaseCurves,
-    AnimationKeyframe,
+    //AnimationKeyframe,
     AnimationWrapMode,
     Asset,
     AssetContainer,
@@ -24,6 +24,8 @@ import {
     Texture,
     Vector3,
 } from '@microsoft/mixed-reality-extension-sdk';
+
+import * as MRE from '@microsoft/mixed-reality-extension-sdk';
 
 interface CardJSON {
     text: string;
@@ -61,14 +63,14 @@ game.setState({
     }
 });
 
-// game.setState({rules: {insurance: false}});
-game.dispatch(actions.join({ seatPosition: 'P2' }));
-game.dispatch(actions.join({ seatPosition: 'P3' }));
-game.dispatch(actions.join({ seatPosition: 'P4' }));
+game.setState({rules: {insurance: false}});
+//game.dispatch(actions.join({ seatPosition: 'P2' }));
+//game.dispatch(actions.join({ seatPosition: 'P3' }));
+//game.dispatch(actions.join({ seatPosition: 'P4' }));
 // console.log(game.getState())
-console.log(game.getState().seat[0].handInfoP2.right)
-console.log(game.getState().seat[1].handInfoP3.right)
-console.log(game.getState().seat[2].handInfoP4.right)
+//console.log(game.getState().seat[0].handInfoP2.right)
+//console.log(game.getState().seat[1].handInfoP3.right)
+//console.log(game.getState().seat[2].handInfoP4.right)
 /**
  * The main class of this app. All the logic goes here.
  */
@@ -158,10 +160,14 @@ export default class MREBlackjack {
     { text: "A", suite: "diamonds", value: 1, color: "R" }]
 
     private blackJackWin: Sound;
+    private assets: MRE.AssetContainer;
 
-    constructor(private context: Context, private baseUrl: string, private assets: AssetContainer) {
+    constructor(private context: Context, private params: MRE.ParameterSet, private baseUrl: string) {
+        console.log('It works here');
         this.context.onStarted(() => this.started());
-        this.assets = new AssetContainer(this.context);
+        console.log('It works here');
+        this.assets = new MRE.AssetContainer(this.context);
+        console.log('It works here');
     }
 
     /**
@@ -473,9 +479,9 @@ export default class MREBlackjack {
         this.roundText = roundTextPromise;
 
         // Load a glTF model
-        const yesButtonPromise = Actor.CreateFromGltf(this.context, {
+        const yesButtonPromise = Actor.CreateFromGltf(this.assets, {
             // at the given URL
-            resourceUrl: `${this.baseUrl}/UI/BlackjackUI_Button_Yes.glb`,
+            uri: `${this.baseUrl}/UI/BlackjackUI_Button_Yes.glb`,
             // and spawn box colliders around the meshes.
             colliderType: 'box',
             // Also apply the following generic actor properties.
@@ -491,17 +497,17 @@ export default class MREBlackjack {
                 }
             }
         });
-
-        this.yesButton = yesButtonPromise;
+        this.yesButton =  yesButtonPromise;
+        //let this.yesButton = ( yesButtonPromise as MRE.Actor);
 
     }
     private async createHitButton() {
 
         // Assigns the currently null Actor to the promise value
 
-        const hitButtonPromise = Actor.CreateFromGltf(this.context, {
+        const hitButtonPromise = Actor.CreateFromGltf(this.assets, {
             // assigning the actor an art asset
-            resourceUrl: `${this.baseUrl}/UI/BlackjackUI_Button_Hit.glb`,
+            uri: `${this.baseUrl}/UI/BlackjackUI_Button_Hit.glb`,
             // and spawn box colliders around the meshes.
             colliderType: 'box',
             // Also apply the following generic actor properties.
@@ -522,9 +528,9 @@ export default class MREBlackjack {
 
     private async createStayButton() {
 
-        const stayButtonPromise = Actor.CreateFromGltf(this.context, {
+        const stayButtonPromise = Actor.CreateFromGltf(this.assets, {
             // assigning the actor an art asset
-            resourceUrl: `${this.baseUrl}/UI/BlackjackUI_Button_Stay.glb`,
+            uri: `${this.baseUrl}/UI/BlackjackUI_Button_Stay.glb`,
             // and spawn box colliders around the meshes.
             colliderType: 'box',
             // Also apply the following generic actor properties.
@@ -546,9 +552,9 @@ export default class MREBlackjack {
 
     private async createDoubleDownButton() {
 
-        const doubleDownButtonPromise = Actor.CreateFromGltf(this.context, {
+        const doubleDownButtonPromise = Actor.CreateFromGltf(this.assets, {
             // assigning the actor an art asset
-            resourceUrl: `${this.baseUrl}/UI/BlackjackUI_Button_DoubleDown.glb`,
+            uri: `${this.baseUrl}/UI/BlackjackUI_Button_DoubleDown.glb`,
             // and spawn box colliders around the meshes.
             colliderType: 'box',
             // Also apply the following generic actor properties.
@@ -571,9 +577,9 @@ export default class MREBlackjack {
     private async createDealButton() {
 
         // Load a glTF model
-        this.dealButton = Actor.CreateFromGltf(this.context, {
+        this.dealButton = Actor.CreateFromGltf(this.assets, {
             // at the given URL
-            resourceUrl: `${this.baseUrl}/UI/BlackjackUI_Button_Join.glb`,
+            uri: `${this.baseUrl}/UI/BlackjackUI_Button_Join.glb`,
             // and spawn box colliders around the meshes.
             colliderType: 'box',
             // Also apply the following generic actor properties.
@@ -588,7 +594,7 @@ export default class MREBlackjack {
                     }
                 }
             }
-        });
+        })  ;
     }
 
     private async createDealerCards() {
@@ -596,7 +602,7 @@ export default class MREBlackjack {
         let cardPosition = 0;
 
         for (let cards = 0; cards < handArray.length; cards++) {
-            Actor.CreatePrimitive(this.context, {
+            Actor.CreatePrimitive(this.assets, {
                 definition: {
                     shape: PrimitiveShape.Plane
                 },
@@ -621,9 +627,9 @@ export default class MREBlackjack {
 
     private async createSplitButton() {
 
-        const splitButtonPromise = Actor.CreateFromGltf(this.context, {
+        const splitButtonPromise = Actor.CreateFromGltf(this.assets, {
             // assigning the actor an art asset
-            resourceUrl: `${this.baseUrl}/UI/BlackjackUI_Button_Split.glb`,
+            uri: `${this.baseUrl}/UI/BlackjackUI_Button_Split.glb`,
             // and spawn box colliders around the meshes.
             colliderType: 'box',
             // Also apply the following generic actor properties.
@@ -655,7 +661,7 @@ export default class MREBlackjack {
         for (let card = 0; card < rightHandArray.length; card++) {
 
             // Load a glTF model
-            let rightPlayerCard = Actor.CreatePrimitive(this.context, {
+            let rightPlayerCard = Actor.CreatePrimitive(this.assets, {
                 // at the given URL
                 definition: {
                     shape: PrimitiveShape.Plane
@@ -686,7 +692,7 @@ export default class MREBlackjack {
         if (leftHandArray !== undefined) {
             for (let card = 0; card < leftHandArray.length; card++) {
                 // Load a glTF model
-                let leftPlayerCard = Actor.CreatePrimitive(this.context, {
+                let leftPlayerCard = Actor.CreatePrimitive(this.assets, {
                     // at the given URL
                     definition: {
                         shape: PrimitiveShape.Plane
@@ -724,9 +730,9 @@ export default class MREBlackjack {
     private async createDeckIndicator() {
 
         if (game.getState().stage === 'player-turn-right') {
-            Actor.CreateFromGltf(this.context, {
+            Actor.CreateFromGltf(this.assets, {
                 // at the given URL
-                resourceUrl: `${this.baseUrl}/red-arrow.glb`,
+                uri: `${this.baseUrl}/red-arrow.glb`,
                 // and spawn box colliders around the meshes.
                 colliderType: 'box',
                 // Also apply the following generic actor properties.
@@ -746,9 +752,9 @@ export default class MREBlackjack {
             });
         } else if (game.getState().stage === 'player-turn-left') {
 
-            Actor.CreateFromGltf(this.context, {
+            Actor.CreateFromGltf(this.assets, {
                 // at the given URL
-                resourceUrl: `${this.baseUrl}/red-arrow.glb`,
+                uri: `${this.baseUrl}/red-arrow.glb`,
                 // and spawn box colliders around the meshes.
                 colliderType: 'box',
                 // Also apply the following generic actor properties.
@@ -775,10 +781,10 @@ export default class MREBlackjack {
 
     private async createDesk() {
 
-        const deskPromise = Actor.CreateFromGltf(this.context, {
+        const deskPromise = Actor.CreateFromGltf(this.assets, {
             // at the given URL
-            resourceUrl: `${this.baseUrl}/blackjack-table-2.glb`,
-            assetName: 'Table/Table_Mesh',
+            uri: `${this.baseUrl}/blackjack-table-2.glb`,
+            //assetName: 'Table/Table_Mesh',
             // and spawn box colliders around the meshes.
             // Also apply the following generic actor properties.
             actor: {
@@ -813,7 +819,7 @@ export default class MREBlackjack {
         // Since there is a possibility of multiple HANDS due to SPLITTING we will call the HIT action based on the STAGE.
         hitButtonBehavior.onClick(() => {
             if (game.getState().stage === 'player-turn-right') {
-                this.hitButton.enableAnimation('DoAFlip');
+                //this.hitButton.enableAnimation('DoAFlip');
                 game.dispatch(actions.hit("right"));
                 if (game.getState().stage === 'player-turn-left' && game.getState().handInfo.left.availableActions === undefined) {
                     console.log('hey')
@@ -825,7 +831,7 @@ export default class MREBlackjack {
                 this.createDealerCards();
                 this.displayWinnerRight();
             } else if (game.getState().stage === 'player-turn-left') {
-                this.hitButton.enableAnimation('DoAFlip');
+                //this.hitButton.enableAnimation('DoAFlip');
                 game.dispatch(actions.hit({ position: 'left' }));
                 this.rootActor.destroy();
                 this.createRootActor();
@@ -876,10 +882,10 @@ export default class MREBlackjack {
         // When hit button is clicked trigger game dispatch to hit
         doubleDownButtonBehavior.onClick(() => {
             if (game.getState().stage === 'player-turn-right') {
-                this.hitButton.enableAnimation('DoAFlip');
+                //this.hitButton.enableAnimation('DoAFlip');
                 game.dispatch(actions.double("right"));
             } else if (game.getState().stage === 'player-turn-left') {
-                this.hitButton.enableAnimation('DoAFlip');
+                //this.hitButton.enableAnimation('DoAFlip');
                 game.dispatch(actions.double({ position: 'left' }));
             }
         });
@@ -979,7 +985,7 @@ export default class MREBlackjack {
         // Since there is a possibility of multiple HANDS due to SPLITTING we will call the STAND action based on the STAGE.
         stayButtonBehavior.onClick(() => {
             if (game.getState().stage === 'player-turn-right') {
-                this.stayButton.enableAnimation('DoAFlip');
+                //this.stayButton.enableAnimation('DoAFlip');
                 game.dispatch(actions.stand('right'));
                 if (game.getState().stage === 'player-turn-left' && game.getState().handInfo.left.availableActions === undefined) {
                     console.log('hey')
@@ -993,7 +999,7 @@ export default class MREBlackjack {
                 // console.log(game.getState().history)
                 console.log(game.getState().finalBet)
             } else if (game.getState().stage === 'player-turn-left') {
-                this.stayButton.enableAnimation('DoAFlip');
+                //this.stayButton.enableAnimation('DoAFlip');
                 game.dispatch(actions.stand({ position: 'left' }));
                 this.rootActor.destroy();
                 this.createRootActor();
